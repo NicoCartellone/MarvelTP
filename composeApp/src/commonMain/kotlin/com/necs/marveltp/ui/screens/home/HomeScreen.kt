@@ -33,16 +33,11 @@ fun HomeScreen(
                 Text(
                     "Marvel Characters",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
                 )
-                HomeSearchBar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { newQuery ->
-                        searchQuery = newQuery
-                    }
-                )
+                HomeSearchBar(searchQuery = searchQuery, onSearchQueryChange = { newQuery ->
+                    searchQuery = newQuery
+                })
             }
         }
         Box(

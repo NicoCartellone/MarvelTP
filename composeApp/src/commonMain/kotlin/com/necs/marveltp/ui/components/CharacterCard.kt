@@ -17,19 +17,19 @@ import com.necs.marveltp.data.models.Character
 @Composable
 fun CharacterCard(
     character: Character,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
-        onClick = { onClick() }
+        onClick = { onClick() },
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
             Text(character.name)
             AsyncImage(
                 model = character.thumbnailUrl,
                 contentDescription = "Character image",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
         }
     }
