@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.necs.marveltp.data.models.Character
-import com.necs.marveltp.data.models.characters
 
 @Composable
-fun CharacterList(onClick: (Character) -> Unit, modifier: Modifier) {
+fun CharacterList(onClick: (Character) -> Unit, modifier: Modifier, characters: List<Character>) {
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Adaptive(120.dp),
