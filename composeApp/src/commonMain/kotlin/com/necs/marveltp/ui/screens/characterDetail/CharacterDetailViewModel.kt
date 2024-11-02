@@ -20,10 +20,13 @@ class CharacterDetailViewModel(
     init {
         viewModelScope.launch {
             state = UiState(loading = true)
-            state = UiState(
-                loading = false,
-                character = charactersService.getCharacterById(id)
-            )
+            try {
+                charactersService.getCharacterById(id).collect {
+                    state = UiState(loading = false, character = it)
+                }
+            }catch (e: Exception){
+                state = UiState(loading = false)
+            }
         }
     }
 

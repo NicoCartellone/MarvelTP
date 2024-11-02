@@ -2,16 +2,18 @@ package com.necs.marveltp.data.network
 
 import com.necs.marveltp.data.models.Character
 import com.necs.marveltp.data.repository.CharactersRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class CharactersService(private val charactersRepository: CharactersRepository) {
 
-    suspend fun getCharacters(): List<Character> {
+    fun getCharacters(): Flow<List<Character>> = flow  {
         val characters = charactersRepository.getCharacters()
-        return sort(characters)
+        emit(sort(characters))
     }
 
-    suspend fun getCharacterById(id: Int): Character {
-        return charactersRepository.getCharacterById(id)
+    fun getCharacterById(id: Int): Flow<Character> = flow {
+        emit(charactersRepository.getCharacterById(id))
     }
 
     private fun sort(characters: List<Character>): List<Character> {

@@ -24,9 +24,10 @@ class HomeViewModel(
         viewModelScope.launch {
             state = UiState(loading = true)
             try {
-                val characters = charactersService.getCharacters()
-                println(characters)
-                state = UiState(loading = false, characters = characters)
+                charactersService.getCharacters().collect { characters ->
+                    println(characters)
+                    state = UiState(loading = false, characters = characters)
+                }
             } catch (e: Exception) {
                 state = UiState(loading = false)
             }
