@@ -1,6 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.gradleBuildConfig)
 }
 
 kotlin {
@@ -96,5 +97,16 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
+}
+
+buildConfig {
+    packageName = "com.necs.marveltp"
+    val properties = Properties()
+    properties.load(project.rootProject.file("local.properties").reader())
+    val publicKey = properties.getProperty("PUBLIC_KEY")
+    val privateKey = properties.getProperty("PRIVATE_KEY")
+
+    buildConfigField("PUBLIC_KEY", publicKey)
+    buildConfigField("PRIVATE_KEY", privateKey)
 }
 
