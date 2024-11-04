@@ -37,7 +37,7 @@ fun HomeScreen(
 ) {
     Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-        var searchQuery by remember { mutableStateOf("") }
+        var searchQuery by remember { mutableStateOf(vm.searchQuery) }
 
         Scaffold(
             topBar = {
@@ -59,10 +59,16 @@ fun HomeScreen(
                     searchQuery = searchQuery,
                     onSearchQueryChange = { newQuery ->
                         searchQuery = newQuery
+                        if(newQuery.isEmpty()) vm.fetchCharacters()
+                        else
+                        vm.fetchCharactersByName(newQuery)
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 val state = vm.state
+                if(state.error != null){
+                    Text("${state.error}", modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
                 if(state.loading){
                     Box(
                         modifier = Modifier.fillMaxSize(),

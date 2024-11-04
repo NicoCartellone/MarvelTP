@@ -16,6 +16,11 @@ class CharactersService(private val charactersRepository: CharactersRepository) 
         emit(charactersRepository.getCharacterById(id))
     }
 
+    fun searchCharacterByName(name: String): Flow<List<Character>> = flow {
+        val characters = charactersRepository.searchCharacterByName(name)
+        emit(sort(characters))
+    }
+
     private fun sort(characters: List<Character>): List<Character> {
         return characters.sortedWith(CharacterComparator())
     }
