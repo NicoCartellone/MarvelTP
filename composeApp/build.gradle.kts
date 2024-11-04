@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.gradleBuildConfig)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -35,8 +36,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.sqldelight.android.driver)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -53,9 +54,11 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.sqldelight.driver)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
     }
 
@@ -108,5 +111,13 @@ buildConfig {
 
     buildConfigField("PUBLIC_KEY", publicKey)
     buildConfigField("PRIVATE_KEY", privateKey)
+}
+
+sqldelight {
+    databases {
+        create("MarvelDatabase") {
+            packageName.set("com.necs.marvelapp")
+        }
+    }
 }
 

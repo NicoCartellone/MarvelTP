@@ -1,0 +1,22 @@
+CREATE TABLE MarvelCharacters (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    thumbnail TEXT NOT NULL
+);
+
+insertMarvelCharacter:
+INSERT OR IGNORE INTO MarvelCharacters(id, name, description, thumbnail)
+VALUES (?, ?, ?, ?);
+
+deleteAllMarvelCharacters:
+DELETE FROM MarvelCharacters;
+
+deleteMarvelCharacter:
+DELETE FROM MarvelCharacters WHERE id = ?;
+
+getAllMarvelCharacters:
+SELECT * FROM MarvelCharacters;
+
+getMarvelCharacter:
+SELECT * FROM MarvelCharacters WHERE id = ?;

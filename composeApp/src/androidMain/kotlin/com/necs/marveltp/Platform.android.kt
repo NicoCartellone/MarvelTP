@@ -1,6 +1,10 @@
 package com.necs.marveltp
 
+import android.content.Context
 import android.os.Build
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.necs.marvelapp.MarvelDatabase
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -9,6 +13,7 @@ class AndroidPlatform : Platform {
 }
 
 actual fun getPlatform(): Platform = AndroidPlatform()
+
 actual fun currentTimeMillis(): Long {
     return System.currentTimeMillis()
 }
@@ -20,5 +25,14 @@ actual fun md5(input: String): String {
     } catch (e: NoSuchAlgorithmException) {
         e.printStackTrace()
         ""
+    }
+}
+
+actual class DatabaseDriverFactory(private val context: Context) {
+    actual fun createDriver(): SqlDriver {
+        return AndroidSqliteDriver(
+            MarvelDatabase.Schema, context,
+            "marvelapp.db"
+        )
     }
 }

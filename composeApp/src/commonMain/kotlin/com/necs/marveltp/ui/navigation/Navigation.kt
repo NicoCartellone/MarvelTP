@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.necs.marveltp.data.local.CharactersDBRepository
+import com.necs.marveltp.data.local.CharactersDBRepositoryImpl
 import com.necs.marveltp.data.network.CharactersService
 import com.necs.marveltp.data.repository.RemoteCharactersRepository
 import com.necs.marveltp.ui.screens.characterDetail.CharacterDetailScreen
@@ -15,7 +17,9 @@ import com.necs.marveltp.ui.screens.home.HomeScreen
 import com.necs.marveltp.ui.screens.home.HomeViewModel
 
 @Composable
-fun Navigation() {
+fun Navigation(
+    charactersDBRepository: CharactersDBRepository
+) {
     val navController = rememberNavController()
     val charactersRepository = RemoteCharactersRepository()
 
@@ -26,7 +30,10 @@ fun Navigation() {
                     navController.navigate("CharacterDetail/${character.id}")
                 },
                 vm = viewModel {
-                    HomeViewModel(CharactersService(charactersRepository))
+                    HomeViewModel(
+                        CharactersService(charactersRepository),
+                        charactersDBRepository
+                    )
                 }
             )
         }

@@ -1,5 +1,8 @@
 package com.necs.marveltp
 
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import com.necs.marvelapp.MarvelDatabase
 import platform.UIKit.UIDevice
 import platform.Foundation.NSDate
 import platform.Foundation.timeIntervalSince1970
@@ -11,6 +14,7 @@ class IOSPlatform: Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+
 actual fun currentTimeMillis(): Long {
     return (NSDate().timeIntervalSince1970 * 1000).toLong() // Convertir a milisegundos
 }
@@ -21,4 +25,10 @@ actual fun md5(input: String): String {
     CC_MD5(data.ref, data.size.convert(), digest.ref)
 
     return digest.joinToString("") { "%02x".format(it) }
+}
+
+actual class DatabaseDriverFactory {
+    actual fun createDriver(): SqlDriver {
+        return NativeSqliteDriver(MarvelDatabase.Schema, "marvelapp.db")
+    }
 }
