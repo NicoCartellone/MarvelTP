@@ -1,12 +1,12 @@
 package com.necs.marveltp.data.local
 
+import app.cash.sqldelight.db.SqlDriver
 import com.necs.marvelapp.MarvelDatabase
 import com.necs.marvelapp.MarvelDbQueries
-import com.necs.marveltp.DatabaseDriverFactory
 import com.necs.marveltp.data.models.Character
 
-class CharactersDBRepositoryImpl(driverFactory: DatabaseDriverFactory) : CharactersDBRepository {
-    private val charactersDB = MarvelDatabase(driverFactory.createDriver())
+class CharactersDBRepositoryImpl(createDriver: SqlDriver) : CharactersDBRepository {
+    private val charactersDB = MarvelDatabase(createDriver)
     private val query: MarvelDbQueries = charactersDB.marvelDbQueries
 
     override suspend fun getAllCharacters(): List<Character> {
