@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,13 +29,17 @@ import com.necs.marveltp.ui.screens.Screen
 import marveltp.composeapp.generated.resources.Res
 import marveltp.composeapp.generated.resources.app_name
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, KoinExperimentalAPI::class)
 @Composable
 fun HomeScreen(
     onCharacterClick: (Character) -> Unit,
-    vm: HomeViewModel
+    vm: HomeViewModel = koinViewModel(),
 ) {
+    val uiState: HomeUIState by vm.uiState.collectAsState()
+
     Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         var searchQuery by remember { mutableStateOf(vm.searchQuery) }
@@ -59,29 +64,37 @@ fun HomeScreen(
                     searchQuery = searchQuery,
                     onSearchQueryChange = { newQuery ->
                         searchQuery = newQuery
-                        if(newQuery.isEmpty()) vm.fetchCharacters()
+                        if (newQuery.isEmpty()) vm.fetchCharacters()
                         else
-                        vm.fetchCharactersByName(newQuery)
+                            vm.fetchCharactersByName(newQuery)
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                val state = vm.state
-                if(state.error != null){
-                    Text("${state.error}", modifier = Modifier.align(Alignment.CenterHorizontally))
-                }
-                if(state.loading){
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                when (val charactersState = uiState.charactersUIState) {
+                    is CharactersUIState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    is CharactersUIState.Success -> {
+                        CharacterList(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            onClick = onCharacterClick,
+                            characters = charactersState.characters,
+                        )
+                    }
+
+                    is CharactersUIState.Error -> {
+                        Text(
+                            charactersState.message,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
-                CharacterList(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    onClick = onCharacterClick,
-                    characters = state.characters,
-                )
             }
         }
     }

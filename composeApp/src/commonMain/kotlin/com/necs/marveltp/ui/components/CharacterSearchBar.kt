@@ -32,7 +32,7 @@ fun CharacterSearchBar(
             },
             shape = RoundedCornerShape(30.dp),
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = "Buscar personajes...") },
+            placeholder = { Text(text = "Search characters...") },
         )
     }
 }
