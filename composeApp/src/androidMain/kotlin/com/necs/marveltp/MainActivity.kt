@@ -14,15 +14,13 @@ import androidx.core.view.WindowCompat
 import com.necs.marveltp.data.local.CharactersDBRepositoryImpl
 
 class MainActivity : ComponentActivity() {
-    private val characterDBRepository = CharactersDBRepositoryImpl(DatabaseDriverFactory(this))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             EnableTransparentStatusBar()
-
-            App(characterDBRepository)
+            App()
         }
     }
 }

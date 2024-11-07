@@ -1,5 +1,6 @@
 package com.necs.marveltp.ui.screens.home
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,15 +9,38 @@ import androidx.lifecycle.viewModelScope
 import com.necs.marveltp.data.local.CharactersDBRepository
 import com.necs.marveltp.data.models.Character
 import com.necs.marveltp.data.network.CharactersService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+@Immutable
+sealed interface CharactersUIState {
+    data object Loading : CharactersUIState
+
+    data class Success(
+        val characters: List<Character>,
+    ) : CharactersUIState
+
+    data class Error(
+        val message: String,
+    ) : CharactersUIState
+}
+
+data class HomeUIState(
+    val charactersUIState: CharactersUIState,
+)
 
 class HomeViewModel(
     private val charactersService: CharactersService,
     private val charactersDBRepository: CharactersDBRepository,
 ) : ViewModel() {
+    private val charactersUIState = MutableStateFlow(CharactersUIState.Loading)
 
-    var state by mutableStateOf(UiState())
-        private set
+    private val _uiState = MutableStateFlow(
+        HomeUIState(charactersUIState.value)
+    )
+
+    val uiState = _uiState.asStateFlow()
 
     var searchQuery by mutableStateOf("")
 
@@ -26,18 +50,23 @@ class HomeViewModel(
 
     fun fetchCharacters() {
         viewModelScope.launch {
-            state = UiState(loading = true)
+            _uiState.value = _uiState.value.copy(charactersUIState = CharactersUIState.Loading)
             try {
                 charactersService.getCharacters().collect { characters ->
                     charactersDBRepository.insertCharacters(characters)
-                    state = UiState(loading = false, characters = characters)
+                    _uiState.value =
+                        _uiState.value.copy(charactersUIState = CharactersUIState.Success(characters))
                 }
             } catch (e: Exception) {
                 val cachedCharacters = charactersDBRepository.getAllCharacters()
-                state = if(cachedCharacters.isNotEmpty()){
-                    UiState(loading = false, characters = cachedCharacters)
+                _uiState.value = if (cachedCharacters.isNotEmpty()) {
+                    _uiState.value.copy(
+                        charactersUIState = CharactersUIState.Success(
+                            cachedCharacters
+                        )
+                    )
                 } else {
-                    UiState(loading = false, characters = emptyList(), error = "No hay personajes disponibles.")
+                    _uiState.value.copy(charactersUIState = CharactersUIState.Error("No available characters."))
                 }
             }
         }
@@ -46,24 +75,23 @@ class HomeViewModel(
     fun fetchCharactersByName(name: String) {
         searchQuery = name
         viewModelScope.launch {
-            state = UiState(loading = true)
+            _uiState.value = _uiState.value.copy(charactersUIState = CharactersUIState.Loading)
             try {
                 charactersService.searchCharacterByName(name).collect { characters ->
-                    state = if (characters.isEmpty()){
-                        UiState(loading = false, characters = emptyList(), error = "No hay personajes disponibles.")
+                    if (characters.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            charactersUIState = CharactersUIState.Error("No available characters.")
+                        )
                     } else {
-                        UiState(loading = false, characters = characters)
+                        _uiState.value = _uiState.value.copy(
+                            charactersUIState = CharactersUIState.Success(characters)
+                        )
                     }
                 }
             } catch (e: Exception) {
-                state = UiState(loading = false, characters = emptyList(), error = "No hay personajes disponibles.")
+                _uiState.value =
+                    _uiState.value.copy(charactersUIState = CharactersUIState.Error("No available characters."))
             }
         }
     }
-
-    data class UiState(
-        val loading: Boolean = false,
-        val characters: List<Character> = emptyList(),
-        val error: String? = null
-    )
 }
